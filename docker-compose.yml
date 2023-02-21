@@ -1,0 +1,91 @@
+version: '3'
+
+services:
+  kusama-encointer-boot:
+    container_name: kusama-encointer-boot
+    image: metaspan/encointer-collator:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        RELEASE: "latest" # 1.3.3 # TODO: not used... remove this
+    restart: on-failure
+    ports:
+      - "26072:26072"  # p2p port
+      - "26073:26073"  # prometheus port
+      - "26074:26074"  # rpc port
+      - "26075:26075"  # ws port
+    volumes:
+      - /media/ld1/kusama/encointer-boot:/data
+    command: [
+      "--chain", "encointer-kusama",
+      "--name", "METASPAN-BOOT",
+      "--telemetry-url", "wss://telemetry-backend.w3f.community/submit 1",
+      "--no-hardware-benchmarks",
+      "--no-mdns",
+      "--base-path", "/data",
+      # "--database=paritydb",
+      "--pruning", "10",
+      "--listen-addr", "/ip4/0.0.0.0/tcp/26072",
+      "--public-addr", "/ip4/195.144.22.130/tcp/26072",
+      "--prometheus-port", "26073",
+      "--prometheus-external",
+      "--rpc-port=26074",
+      "--rpc-external",
+      "--rpc-methods", "safe",
+      "--rpc-cors", "all",
+      #"--listen-addr=/ip4/0.0.0.0/tcp/26075/ws",
+      "--ws-port=26075",
+      "--ws-external",
+      "--in-peers=6",
+      "--out-peers=4",
+      "--no-mdns",
+      "--no-hardware-benchmarks",
+      "--db-cache=4096",
+      "--runtime-cache-size=1",
+      "--relay-chain-rpc-url=ws://192.168.10.93:23025"
+    ]
+
+  kusama-encointer-rpc:
+    container_name: kusama-encointer-rpc
+    image: metaspan/encointer-collator:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        RELEASE: "latest" # 1.3.3 # TODO: not used, remove this
+    restart: on-failure
+    ports:
+      - "26082:26082"  # p2p port
+      - "26083:26083"  # prometheus port
+      - "26084:26084"  # rpc port
+      - "26085:26085"  # ws port
+    volumes:
+      - /media/ld1/kusama/encointer-rpc:/data
+    command: [
+      "--chain", "encointer-kusama",
+      "--name", "METASPAN-RPC",
+      "--telemetry-url", "wss://telemetry-backend.w3f.community/submit 1",
+      # "--no-hardware-benchmarks", "--no-mdns",
+      "--base-path", "/data",
+      #--database=paritydb \
+      "--pruning", "archive",
+      "--listen-addr", "/ip4/0.0.0.0/tcp/26082",
+      "--public-addr", "/ip4/195.144.22.130/tcp/26082",
+      "--prometheus-port", "26083",
+      "--prometheus-external",
+      "--rpc-port=26084",
+      "--rpc-external",
+      "--rpc-methods", "safe",
+      "--rpc-cors", "all",
+      #"--listen-addr=/ip4/0.0.0.0/tcp/26085/ws",
+      "--ws-port=26085",
+      "--ws-external",
+      "--in-peers=6",
+      "--out-peers=4",
+      "--no-mdns",
+      "--no-hardware-benchmarks",
+      "--db-cache=4096",
+      "--runtime-cache-size=1",
+      "--relay-chain-rpc-url=ws://192.168.10.93:23025"
+    ]
