@@ -4,19 +4,24 @@ services:
   kusama-encointer-boot:
     container_name: kusama-encointer-boot
     image: metaspan/encointer-collator:latest
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 12G
     build:
       context: .
       dockerfile: Dockerfile
       args:
         RELEASE: "latest" # 1.3.3 # TODO: not used... remove this
-    restart: on-failure
+    restart: unless-stopped
     ports:
       - "26072:26072"  # p2p port
       - "26073:26073"  # prometheus port
       - "26074:26074"  # rpc port
       - "26075:26075"  # ws port
     volumes:
-      - /media/ld1/kusama/encointer-boot:/data
+      - /mnt/ld0/kusama/encointer-boot:/data
     command: [
       "--chain", "encointer-kusama",
       "--name", "METASPAN-BOOT",
@@ -39,29 +44,33 @@ services:
       "--ws-external",
       "--in-peers=6",
       "--out-peers=4",
-      "--no-mdns",
-      "--no-hardware-benchmarks",
       "--db-cache=4096",
       "--runtime-cache-size=1",
-      "--relay-chain-rpc-url=ws://192.168.10.93:23025"
+      #"--relay-chain-rpc-url=ws://192.168.10.93:23025",
+      "--relay-chain-rpc-url=ws://192.168.1.92:40425",
     ]
 
   kusama-encointer-rpc:
     container_name: kusama-encointer-rpc
     image: metaspan/encointer-collator:latest
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 12G
     build:
       context: .
       dockerfile: Dockerfile
       args:
         RELEASE: "latest" # 1.3.3 # TODO: not used, remove this
-    restart: on-failure
+    restart: unless-stopped
     ports:
       - "26082:26082"  # p2p port
       - "26083:26083"  # prometheus port
       - "26084:26084"  # rpc port
       - "26085:26085"  # ws port
     volumes:
-      - /media/ld1/kusama/encointer-rpc:/data
+      - /mnt/ld0/kusama/encointer-rpc:/data
     command: [
       "--chain", "encointer-kusama",
       "--name", "METASPAN-RPC",
@@ -87,5 +96,6 @@ services:
       "--no-hardware-benchmarks",
       "--db-cache=4096",
       "--runtime-cache-size=1",
-      "--relay-chain-rpc-url=ws://192.168.10.93:23025"
+      #"--relay-chain-rpc-url=ws://192.168.10.93:23025",
+      "--relay-chain-rpc-url=ws://192.168.1.92:40425",
     ]
